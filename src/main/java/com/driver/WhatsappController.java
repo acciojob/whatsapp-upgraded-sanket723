@@ -27,7 +27,14 @@ public class WhatsappController {
         //If the mobile number exists in database, throw "User already exists" exception
         //Otherwise, create the user and return "SUCCESS"
 
-        return whatsappService.createUser(name, mobile);
+        String msg = whatsappService.createUser(name,mobile);
+
+        if(msg.equals("User already exists"))
+            throw new Exception("User already exists");
+
+        return msg;
+
+        //return whatsappService.createUser(name, mobile);
     }
 
     @PostMapping("/add-group")
@@ -58,7 +65,18 @@ public class WhatsappController {
         //Throw "You are not allowed to send message" if the sender is not a member of the group
         //If the message is sent successfully, return the final number of messages in that group.
 
-        return whatsappService.sendMessage(message, sender, group);
+        int ans = whatsappService.sendMessage(message, sender, group);
+
+        if(ans == -1){
+            throw new Exception("Group does not exist");
+        }
+        if(ans == -2){
+            throw new Exception("You are not allowed to send message");
+        }
+
+        return ans;
+
+       // return whatsappService.sendMessage(message, sender, group);
     }
     @PutMapping("/change-admin")
     public String changeAdmin(User approver, User user, Group group) throws Exception{
@@ -67,7 +85,18 @@ public class WhatsappController {
         //Throw "User is not a participant" if the user is not a part of the group
         //Change the admin of the group to "user" and return "SUCCESS". Note that at one time there is only one admin and the admin rights are transferred from approver to user.
 
-        return whatsappService.changeAdmin(approver, user, group);
+        String msg = whatsappService.changeAdmin(approver, user, group);
+
+        if(msg.equals("Group does not exist"))
+            throw new Exception(msg);
+        if(msg.equals("Approver does not have rights"))
+            throw new Exception(msg);
+        if (msg.equals("User is not a participant"))
+            throw new Exception(msg);
+
+        return msg;
+
+       // return whatsappService.changeAdmin(approver, user, group);
     }
 
     @DeleteMapping("/remove-user")
