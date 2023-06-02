@@ -30,8 +30,8 @@ public class WhatsappRepository {
         this.userMobile = new HashSet<>();
         this.customGroupCount = 0;
         this.messageId = 0;
-        this.userMap=new HashMap<String,User>();         //I created this line
-        this.messageHashMap=new HashMap<Integer,Message>();
+        this.userMap=new HashMap<String,User>();             //I created this
+        this.messageHashMap=new HashMap<Integer,Message>();  //I create
     }
 
 
@@ -132,6 +132,56 @@ public class WhatsappRepository {
 
         return "SUCCESS";
 
+    }
+
+    public int removeUser(User user) {
+        //A user belongs to exactly one group
+        //If user is not found in any group, throw "User not found" exception
+        //If user is found in a group and it is the admin, throw "Cannot remove admin" exception
+        //If user is not the admin, remove the user from the group, remove all its messages from all the databases, and update relevant attributes accordingly.
+        //If user is removed successfully, return (the updated number of users in the group + the updated number of messages in group + the updated number of overall messages)
+
+        boolean flag = false;
+        Group userGroup = null;
+        for(Group group : groupUserMap.keySet()){
+            if(groupUserMap.get(group).contains(user)){
+                flag = true;   //user found;
+                userGroup = group;
+                break;
+            }
+        }
+
+        if(flag==false)
+            return -1;   //user not found case
+
+        if(adminMap.containsValue(user))
+            return -2;   //user is admin, Cannot remove admin case
+
+        //removing from group
+        List<User> userList = groupUserMap.get(userGroup);
+        userList.remove(user);
+
+        //remove messages link with user
+        List<Message> messageList = groupMessageMap.get(userGroup);
+
+        List<Message> messagesByUser = new ArrayList<>();
+
+        for(Message msg : messageList){
+            if(senderMap.get(msg).equals(user)){
+                messagesByUser.add(msg);
+                senderMap.remove(msg);
+            }
+        }
+
+        messageList.removeAll(messagesByUser);   //removing all msgs in group from user
+        userMobile.remove(user.getMobile());    //removing from user_mobile hashset
+        userMap.remove(user.getMobile());       //removing user from userMap
+
+        //final ans to return
+
+        int ans = userGroup.getNumberOfParticipants() + messageList.size() + senderMap.size();
+
+        return ans;
     }
 
 
