@@ -31,6 +31,7 @@ public class WhatsappRepository {
         this.customGroupCount = 0;
         this.messageId = 0;
         this.userMap=new HashMap<String,User>();         //I created this line
+        this.messageHashMap=new HashMap<Integer,Message>();
     }
 
 
@@ -68,11 +69,9 @@ public class WhatsappRepository {
 
     public int createMessage(String content){
         Message message = new Message(content);
-        messageId = messageId+1;
+        messageId++;
         message.setId(messageId);
-
-        Date date = new Date();
-        message.setTimestamp(date);
+        message.setTimestamp(new Date());
 
         messageHashMap.put(messageId,message);
 
