@@ -159,21 +159,36 @@ public class WhatsappRepository {
 
         //removing from group
         List<User> userList = groupUserMap.get(userGroup);
-        userList.remove(user);
+        if(!userList.isEmpty())
+          userList.remove(user);
 
-        //remove messages link with user
+//        //remove messages link with user
+//        List<Message> messageList = groupMessageMap.get(userGroup);
+//
+//        List<Message> messagesByUser = new ArrayList<>();
+//
+//        for(Message msg : messageList){
+//            if(senderMap.get(msg).equals(user)){
+//                messagesByUser.add(msg);
+//                senderMap.remove(msg);
+//            }
+//        }
+//
+//        messageList.removeAll(messagesByUser);   //removing all msgs in group from user
+
+        // remove messages linked with the user
         List<Message> messageList = groupMessageMap.get(userGroup);
-
-        List<Message> messagesByUser = new ArrayList<>();
-
-        for(Message msg : messageList){
-            if(senderMap.get(msg).equals(user)){
-                messagesByUser.add(msg);
-                senderMap.remove(msg);
+        if (messageList != null) {
+            List<Message> messagesByUser = new ArrayList<>();
+            for (Message msg : messageList) {
+                if (senderMap.get(msg).equals(user)) {
+                    messagesByUser.add(msg);
+                    senderMap.remove(msg);
+                }
             }
+            messageList.removeAll(messagesByUser); // removing all msgs in group from user
         }
 
-        messageList.removeAll(messagesByUser);   //removing all msgs in group from user
         userMobile.remove(user.getMobile());    //removing from user_mobile hashset
         userMap.remove(user.getMobile());       //removing user from userMap
 
